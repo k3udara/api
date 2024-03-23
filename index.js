@@ -12,7 +12,7 @@ const salt = bcrypt.genSaltSync(10);
 
 app.use(cors({credentials:true,origin:'http://localhost:5173'}));
 app.use(express.json());
-app.use(cookieParser);
+app.use(cookieParser());
 
 mongoose.connect('mongodb+srv://kxaxuxsxhxaxlxixerox:AlKE8NCaBLuC8XFn@cluster0.p6ljtad.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 
@@ -39,14 +39,14 @@ app.post('/register', async (req,res) => {
 app.post('/login', async (req,res) => {
     const {username,password} = req.body;
     const userDoc = await User.findOne({username});
-    const passok = bcrypt.compareSync(password,userDoc.password)
-    if (passok){
+    const passOk = bcrypt.compareSync(password,userDoc.password)
+    if (passOk){
         jwt.sign({username,id:userDoc._id}, secret, {}, (err,token) => {
             if (err) throw err;
             res.cookie('token', token).json({
-              id:userDoc._id,
-              username,
-            });
+                id:userDoc._id,
+                username,
+              });
           });
 
     }else{
@@ -60,11 +60,13 @@ app.get('/profile', (req,res) =>{
         if (err) throw err;
         res.json(info);
     })
-    
-
 })
 
-app.listen(4001);
+app.post('/logout',(req,res) =>{
+    res.cookie('token', '').json('ok');
+})
+
+app.listen(4000);
 console.log("app is succesfully listning 4000")
 
 
